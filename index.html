@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="glean-artifact-type" content="visual_content">
+<title>One Room, Three Speeds</title>
+<style>
+:root {
+  --artifact-background: #ffffff;
+  --artifact-background-light: #f1f3f6;
+  --artifact-background-mid: #e9ecf1;
+  --artifact-border-light: #e3e6ec;
+  --artifact-border-dark: #cdd2db;
+  --artifact-primary-brand: #3559e6;
+  --artifact-primary-highlight: #0d0f14;
+  --artifact-primary-hover: #2442b8;
+  --artifact-selected: #eaeefc;
+  --artifact-text-primary: #11141a;
+  --artifact-text-secondary: #5c6470;
+  --artifact-text-highlight: #e8eefc;
+  --artifact-positive-background: #e8f6ee;
+  --artifact-positive-text: #11141a;
+  --artifact-positive: #159a6a;
+  --artifact-negative: #dc4c4c;
+
+  --artifact-zone-pool: #e8eefc;
+  --artifact-zone-pod: #eef0f4;
+  --artifact-zone-lounge: #f5f6f9;
+  --artifact-zone-air: #e2e9fb;
+  --artifact-zone-service: #e9ecf1;
+  --artifact-zone-boh: #eceef2;
+  --artifact-felt: #3559e6;
+  --artifact-felt-soft: #8ea3ef;
+  --artifact-ink-faint: #9aa2ae;
+}
+html[data-theme='dark'] {
+  --artifact-background: #0a0b0e;
+  --artifact-background-light: #121419;
+  --artifact-background-mid: #181b22;
+  --artifact-border-light: #23262e;
+  --artifact-border-dark: #343844;
+  --artifact-primary-brand: #6a92ff;
+  --artifact-primary-highlight: #f5f7fb;
+  --artifact-primary-hover: #88a8ff;
+  --artifact-selected: #1a2030;
+  --artifact-text-primary: #eef0f4;
+  --artifact-text-secondary: #9aa0ad;
+  --artifact-text-highlight: #14213d;
+  --artifact-positive-background: #0e2a1d;
+  --artifact-positive-text: #c8f5da;
+  --artifact-positive: #46d39a;
+  --artifact-negative: #ff6b6b;
+
+  --artifact-zone-pool: #16203a;
+  --artifact-zone-pod: #15181f;
+  --artifact-zone-lounge: #121419;
+  --artifact-zone-air: #1b2749;
+  --artifact-zone-service: #14171d;
+  --artifact-zone-boh: #10131a;
+  --artifact-felt: #6a92ff;
+  --artifact-felt-soft: #3f5699;
+  --artifact-ink-faint: #6b7280;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px; font-weight: 400; line-height: 1.6; letter-spacing: -0.005em;
+  background-color: var(--artifact-background); color: var(--artifact-text-primary);
+  margin: 0; padding: 0;
+}
+h1, h2, h3 {
+  font-weight: 400; line-height: 1.05; letter-spacing: -0.02em;
+  color: var(--artifact-text-primary); margin: 0;
+}
+h1 { font-size: clamp(2.5rem, 6.5vw, 4.5rem); font-weight: 300; }
+h2 { font-size: clamp(1.6rem, 3.4vw, 2.5rem); }
+h3 { font-size: 1.15rem; font-weight: 500; }
+.eyebrow {
+  font-family: "SF Mono", "IBM Plex Mono", "Cascadia Code", "Consolas", monospace;
+  font-size: 11.5px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--artifact-text-secondary); margin: 0 0 14px;
+}
+.mono { font-family: "SF Mono", "IBM Plex Mono", "Consolas", monospace; font-size: 13px; }
+p { margin: 0 0 16px; }
+.lede { font-size: 1.12rem; color: var(--artifact-text-secondary); max-width: 62ch; }
+.shell { max-width: 1100px; margin: 0 auto; padding: 0 28px 120px; }
+
+nav.toc {
+  position: sticky; top: 0; z-index: 40;
+  background: var(--artifact-background);
+  border-bottom: 1px solid var(--artifact-border-light);
+  padding: 11px 28px; display: flex; gap: 22px; overflow-x: auto;
+}
+nav.toc a {
+  font-family: "SF Mono", "IBM Plex Mono", "Consolas", monospace;
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--artifact-text-secondary); text-decoration: none; white-space: nowrap;
+  padding-bottom: 2px; border-bottom: 1.5px solid transparent;
+}
+nav.toc a:hover { color: var(--artifact-text-primary); }
+nav.toc a.active { color: var(--artifact-primary-brand); border-bottom-color: var(--artifact-primary-brand); }
+
+header.hero { padding: 86px 0 54px; }
+header.hero h1 { max-width: 20ch; }
+header.hero .lede { margin-top: 26px; }
+
+.statband {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 0; margin-top: 52px; border-top: 1px solid var(--artifact-border-light);
+  border-bottom: 1px solid var(--artifact-border-light);
+}
+.stat { padding: 22px 20px 20px; border-right: 1px solid var(--artifact-border-light); }
+.stat:last-child { border-right: none; }
+.stat .v {
+  font-weight: 300; font-size: clamp(1.9rem, 3.6vw, 2.7rem); line-height: 1;
+  letter-spacing: -0.03em; font-variant-numeric: tabular-nums; display: block;
+}
+.stat .l {
+  font-family: "SF Mono", "IBM Plex Mono", "Consolas", monospace;
+  font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--artifact-text-secondary); margin-top: 9px; display: block;
+}
+
+section { padding: 72px 0 0; }
+section > .eyebrow { margin-bottom: 10px; }
+section > h2 { max-width: 26ch; }
+section > h2 + p { margin-top: 22px; }
+
+.planwrap {
+  margin-top: 34px; border: 1px solid var(--artifact-border-light); border-radius: 6px;
+  background: var(--artifact-background); padding: 20px;
+}
+svg.plan { width: 100%; height: auto; display: block; }
+svg.plan text { font-family: "SF Mono", "IBM Plex Mono", "Consolas", monospace; }
+.zoneG { cursor: default; }
+.zoneG rect.zf { transition: opacity .18s ease; }
+.zoneG.dim rect.zf { opacity: .32; }
+.zoneG.hot rect.zf { opacity: 1; }
+
+.legend {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 1px; margin-top: 30px;
+  background: var(--artifact-border-light);
+  border: 1px solid var(--artifact-border-light); border-radius: 6px; overflow: hidden;
+}
+.lgi {
+  background: var(--artifact-background); padding: 16px 17px; cursor: default;
+  transition: background .16s ease;
+}
+.lgi:hover { background: var(--artifact-background-light); }
+.lgi .sw { width: 26px; height: 8px; border-radius: 2px; display: block; margin-bottom: 11px; border: 1px solid var(--artifact-border-dark); }
+.lgi .n { font-size: 14px; font-weight: 500; display: block; }
+.lgi .d { font-size: 12.5px; color: var(--artifact-text-secondary); display: block; margin-top: 5px; line-height: 1.45; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 14px; }
+th {
+  font-family: "SF Mono", "IBM Plex Mono", "Consolas", monospace;
+  font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--artifact-text-secondary); text-align: left;
+  padding: 0 14px 10px; border-bottom: 1px solid var(--artifact-border-dark);
+}
+th.r, td.r { text-align: right; font-variant-numeric: tabular-nums; }
+td { padding: 11px 14px; border-bottom: 1px solid var(--artifact-border-light); vertical-align: top; }
+tr.tot td { font-weight: 600; border-bottom: none; border-top: 1px solid var(--artifact-border-dark); background: var(--artifact-background-light); }
+td .sub { display: block; color: var(--artifact-text-secondary); font-size: 12.5px; margin-top: 3px; }
+
+.bar { height: 6px; border-radius: 3px; background: var(--artifact-felt-soft); display: block; }
+
+.speeds { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 22px; margin-top: 34px; }
+.speed { border: 1px solid var(--artifact-border-light); border-radius: 6px; padding: 24px; background: var(--artifact-background); }
+.speed .num {
+  font-family: "SF Mono", "IBM Plex Mono", "Consolas", monospace; font-size: 11px;
+  letter-spacing: 0.12em; color: var(--artifact-primary-brand); text-transform: uppercase;
+  display: block; margin-bottom: 14px;
+}
+.speed h3 { margin-bottom: 7px; }
+.speed .who {
+  font-size: 12.5px; color: var(--artifact-text-secondary); margin-bottom: 14px;
+  padding-bottom: 14px; border-bottom: 1px solid var(--artifact-border-light);
+}
+.speed p { font-size: 14px; margin: 0; color: var(--artifact-text-secondary); }
+.speed p strong { color: var(--artifact-text-primary); font-weight: 500; }
+
+.focal {
+  margin-top: 40px; background: var(--artifact-text-highlight); color: var(--artifact-text-primary);
+  border-radius: 6px; padding: 40px 42px;
+}
+.focal .big {
+  font-weight: 300; font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.05;
+  letter-spacing: -0.03em; max-width: 28ch;
+}
+.focal p { margin: 20px 0 0; max-width: 64ch; font-size: 14.5px; }
+
+ul.cl { list-style: none; padding: 0; margin: 30px 0 0; }
+ul.cl li {
+  padding: 17px 0 17px 40px; border-bottom: 1px solid var(--artifact-border-light);
+  position: relative; font-size: 14.5px;
+}
+ul.cl li:first-child { border-top: 1px solid var(--artifact-border-light); }
+ul.cl li::before {
+  content: attr(data-k); position: absolute; left: 0; top: 18px;
+  font-family: "SF Mono", "IBM Plex Mono", "Consolas", monospace; font-size: 11px;
+  color: var(--artifact-primary-brand); letter-spacing: 0.06em;
+}
+ul.cl li b { font-weight: 500; }
+ul.cl li span.cost {
+  display: block; margin-top: 5px; font-family: "SF Mono", "IBM Plex Mono", "Consolas", monospace;
+  font-size: 11.5px; color: var(--artifact-text-secondary); letter-spacing: 0.04em;
+}
+
+.week { margin-top: 32px; border: 1px solid var(--artifact-border-light); border-radius: 6px; overflow: hidden; }
+.wrow { display: grid; grid-template-columns: 92px 1fr 128px; border-bottom: 1px solid var(--artifact-border-light); }
+.wrow:last-child { border-bottom: none; }
+.wrow > div { padding: 15px 17px; font-size: 14px; }
+.wrow .day {
+  font-family: "SF Mono", "IBM Plex Mono", "Consolas", monospace; font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--artifact-text-secondary);
+  border-right: 1px solid var(--artifact-border-light);
+}
+.wrow .tgt { color: var(--artifact-text-secondary); font-size: 12.5px; border-left: 1px solid var(--artifact-border-light); }
+.wrow.peak { background: var(--artifact-background-light); }
+.wrow.peak .day { color: var(--artifact-primary-brand); }
+
+.note {
+  margin-top: 30px; padding: 20px 22px; border: 1px solid var(--artifact-border-dark);
+  border-radius: 6px; font-size: 14px; color: var(--artifact-text-secondary);
+  background: var(--artifact-background-light);
+}
+.note b { color: var(--artifact-text-primary); font-weight: 500; }
+
+.srcs { margin-top: 32px; font-size: 13px; color: var(--artifact-text-secondary); }
+.srcs a { color: var(--artifact-primary-brand); text-decoration: none; }
+.srcs a:hover { text-decoration: underline; }
+.srcs li { margin-bottom: 9px; }
+
+@media (max-width: 620px) {
+  .wrow { grid-template-columns: 1fr; }
+  .wrow .day, .wrow .tgt { border: none; }
+  .focal { padding: 28px 24px; }
+}
+
+@media print {
+  @page { size: auto !important; }
+  body { margin: 0; padding: 0.4in 0.6in; background: #fff; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .shell { max-width: 100% !important; width: 100% !important; padding: 0 !important; }
+  nav.toc { display: none !important; }
+  section, .header, header.hero { break-inside: avoid; margin-bottom: 18px !important; }
+  .planwrap, .speed, .focal, .note, .week, .legend { break-inside: avoid; box-shadow: none !important; }
+  table, thead, .statband, .legend, .week { break-inside: avoid; }
+  [class*="grid"], [class*="row"] { gap: 10px !important; }
+  [class*="fade"], [class*="animate"] { opacity: 1 !important; transform: none !important; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  button, [role="button"] { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<nav class="toc" data-glean-id="nav-toc">
+  <a href="#plan" class="active">Floor plan</a>
+  <a href="#budget">Space budget</a>
+  <a href="#clearance">Clearance math</a>
+  <a href="#speeds">Three speeds</a>
+  <a href="#hockey">Air hockey</a>
+  <a href="#arrival">Arrival</a>
+  <a href="#mechanics">Inclusion mechanics</a>
+  <a href="#week">The week</a>
+  <a href="#price">Pricing</a>
+  <a href="#capex">Capex delta</a>
+</nav>
+
+<div class="shell">
+
+<header class="hero" data-glean-id="hero">
+  <p class="eyebrow">Floor plan &amp; experience design / 3,200 sq ft</p>
+  <h1>One room, three speeds.</h1>
+  <p class="lede">Traditional pool halls fail at mixed audiences because they are one undifferentiated room where the most serious players set the tone for everyone. The fix is not decor. It is zoning the floor so a couple on a first date, a crew of seven, and a league regular can all be in the same building at the same time without any of them feeling like they are in the wrong place.</p>
+  <div class="statband" data-glean-id="stat-band">
+    <div class="stat"><span class="v">3,200</span><span class="l">Sq ft gross</span></div>
+    <div class="stat"><span class="v">5</span><span class="l">Pool tables, 7 ft</span></div>
+    <div class="stat"><span class="v">4</span><span class="l">Console pods</span></div>
+    <div class="stat"><span class="v">1</span><span class="l">Air hockey</span></div>
+    <div class="stat"><span class="v">~90</span><span class="l">Seats</span></div>
+  </div>
+</header>
+
+<section id="plan" data-glean-id="section-plan">
+  <p class="eyebrow">The plan</p>
+  <h2>Drawn to scale, 64 ft by 50 ft</h2>
+  <p class="lede">Every dimension below is real: 5 ft of cue clearance on all four sides of every table, a 10 ft service spine along one wall, and the pool bay placed as far from the front door as the building allows. Hover any zone label to isolate it.</p>
+
+  <div class="planwrap" data-glean-id="floor-plan-svg">
+  <svg class="plan" viewBox="-28 -28 696 556" role="img" aria-label="Scaled floor plan of a 3,200 square foot pool and gaming lounge">
+    <defs>
+      <pattern id="flexHatch" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="0" x2="0" y2="8" stroke="var(--artifact-ink-faint)" stroke-width="1"/>
+      </pattern>
+    </defs>
+
+    <!-- dimension lines -->
+    <g stroke="var(--artifact-ink-faint)" stroke-width="1" fill="none">
+      <line x1="0" y1="-14" x2="640" y2="-14"/>
+      <line x1="0" y1="-18" x2="0" y2="-10"/><line x1="640" y1="-18" x2="640" y2="-10"/>
+      <line x1="-14" y1="0" x2="-14" y2="500"/>
+      <line x1="-18" y1="0" x2="-10" y2="0"/><line x1="-18" y1="500" x2="-10" y2="500"/>
+    </g>
+    <text x="320" y="-19" text-anchor="middle" font-size="11" fill="var(--artifact-text-secondary)" letter-spacing="1.4">64 FT</text>
+    <text x="-19" y="250" text-anchor="middle" font-size="11" fill="var(--artifact-text-secondary)" letter-spacing="1.4" transform="rotate(-90 -19 250)">50 FT</text>
+
+    <!-- shell -->
+    <rect x="0" y="0" width="640" height="500" fill="var(--artifact-background)" stroke="var(--artifact-text-primary)" stroke-width="3"/>
+
+    <!-- POOL BAY -->
+    <g class="zoneG" data-zone="pool">
+      <rect class="zf" x="20" y="10" width="410" height="230" fill="var(--artifact-zone-pool)" stroke="var(--artifact-felt)" stroke-width="1.2" stroke-dasharray="4 3"/>
+      <g fill="var(--artifact-felt)">
+        <rect x="70"  y="60"  width="70" height="40" rx="4"/>
+        <rect x="190" y="60"  width="70" height="40" rx="4"/>
+        <rect x="310" y="60"  width="70" height="40" rx="4"/>
+        <rect x="130" y="150" width="70" height="40" rx="4"/>
+        <rect x="250" y="150" width="70" height="40" rx="4"/>
+      </g>
+      <g fill="var(--artifact-background)" font-size="10" text-anchor="middle">
+        <text x="105" y="84">1</text><text x="225" y="84">2</text><text x="345" y="84">3</text>
+        <text x="165" y="174">4</text><text x="285" y="174">5</text>
+      </g>
+      <text x="30" y="30" font-size="11" fill="var(--artifact-felt)" letter-spacing="1.3">POOL BAY · 940 SQ FT</text>
+      <text x="30" y="228" font-size="9.5" fill="var(--artifact-text-secondary)" letter-spacing="0.8">5 FT CUE CLEARANCE, SHARED BETWEEN TABLES</text>
+      <!-- clearance arrow between tables 1 and 2 -->
+      <g stroke="var(--artifact-felt-soft)" stroke-width="1">
+        <line x1="140" y1="80" x2="190" y2="80"/>
+        <line x1="140" y1="76" x2="140" y2="84"/><line x1="190" y1="76" x2="190" y2="84"/>
+      </g>
+      <text x="165" y="73" font-size="8.5" text-anchor="middle" fill="var(--artifact-text-secondary)">5'</text>
+    </g>
+
+    <!-- CONSOLE PODS -->
+    <g class="zoneG" data-zone="pods">
+      <rect class="zf" x="20" y="250" width="160" height="180" fill="var(--artifact-zone-pod)" stroke="var(--artifact-border-dark)" stroke-width="1"/>
+      <g fill="none" stroke="var(--artifact-text-secondary)" stroke-width="1.2">
+        <rect x="28"  y="258" width="68" height="78" rx="3"/>
+        <rect x="104" y="258" width="68" height="78" rx="3"/>
+        <rect x="28"  y="344" width="68" height="78" rx="3"/>
+        <rect x="104" y="344" width="68" height="78" rx="3"/>
+      </g>
+      <g fill="var(--artifact-felt)">
+        <rect x="46"  y="262" width="32" height="5" rx="2"/>
+        <rect x="122" y="262" width="32" height="5" rx="2"/>
+        <rect x="46"  y="348" width="32" height="5" rx="2"/>
+        <rect x="122" y="348" width="32" height="5" rx="2"/>
+      </g>
+      <g fill="var(--artifact-text-secondary)" font-size="9" text-anchor="middle">
+        <text x="62" y="305">POD A</text><text x="138" y="305">POD B</text>
+        <text x="62" y="391">POD C</text><text x="138" y="391">POD D</text>
+      </g>
+      <text x="26" y="245" font-size="11" fill="var(--artifact-text-primary)" letter-spacing="1.3">PODS · 290</text>
+    </g>
+
+    <!-- LOUNGE CORE -->
+    <g class="zoneG" data-zone="lounge">
+      <rect class="zf" x="190" y="250" width="140" height="110" fill="var(--artifact-zone-lounge)" stroke="var(--artifact-border-dark)" stroke-width="1"/>
+      <rect class="zf" x="340" y="250" width="110" height="90" fill="var(--artifact-zone-lounge)" stroke="var(--artifact-border-dark)" stroke-width="1"/>
+      <rect class="zf" x="140" y="440" width="190" height="60" fill="var(--artifact-zone-lounge)" stroke="var(--artifact-border-dark)" stroke-width="1"/>
+      <g fill="none" stroke="var(--artifact-text-secondary)" stroke-width="1">
+        <circle cx="222" cy="282" r="12"/><circle cx="262" cy="282" r="12"/><circle cx="302" cy="282" r="12"/>
+        <circle cx="222" cy="328" r="12"/><circle cx="262" cy="328" r="12"/><circle cx="302" cy="328" r="12"/>
+        <circle cx="372" cy="282" r="13"/><circle cx="418" cy="282" r="13"/>
+        <rect x="150" y="452" width="52" height="36" rx="3"/>
+        <rect x="212" y="452" width="52" height="36" rx="3"/>
+        <rect x="274" y="452" width="46" height="36" rx="3"/>
+      </g>
+      <text x="196" y="356" font-size="9" fill="var(--artifact-text-secondary)" letter-spacing="0.8">HIGH-TOPS</text>
+      <text x="346" y="334" font-size="9" fill="var(--artifact-text-secondary)" letter-spacing="0.8">PERCH</text>
+      <text x="148" y="434" font-size="11" fill="var(--artifact-text-primary)" letter-spacing="1.3">BOOTHS · LOUNGE 370</text>
+    </g>
+
+    <!-- FLEX FLOOR -->
+    <g class="zoneG" data-zone="flex">
+      <rect class="zf" x="190" y="360" width="140" height="80" fill="url(#flexHatch)" stroke="var(--artifact-border-dark)" stroke-width="1" stroke-dasharray="5 4"/>
+<text x="260" y="396" font-size="10" text-anchor="middle" fill="var(--artifact-text-primary)" letter-spacing="1">FLEX FLOOR</text>
+      <text x="260" y="412" font-size="9" text-anchor="middle" fill="var(--artifact-text-secondary)">110 SQ FT · TABLE 6 GOES HERE</text>
+    </g>
+
+    <!-- AIR HOCKEY -->
+    <g class="zoneG" data-zone="air">
+      <rect class="zf" x="340" y="340" width="100" height="150" fill="var(--artifact-zone-air)" stroke="var(--artifact-felt)" stroke-width="1.2"/>
+      <rect x="368" y="375" width="44" height="83" rx="3" fill="var(--artifact-felt)"/>
+      <line x1="368" y1="416" x2="412" y2="416" stroke="var(--artifact-background)" stroke-width="1.2"/>
+      <circle cx="390" cy="416" r="7" fill="none" stroke="var(--artifact-background)" stroke-width="1.2"/>
+      <g stroke="var(--artifact-felt-soft)" stroke-width="1">
+        <line x1="390" y1="345" x2="390" y2="375"/>
+        <line x1="386" y1="345" x2="394" y2="345"/><line x1="386" y1="375" x2="394" y2="375"/>
+      </g>
+      <text x="398" y="362" font-size="8.5" fill="var(--artifact-text-secondary)">3' GOAL END</text>
+      <text x="346" y="333" font-size="11" fill="var(--artifact-felt)" letter-spacing="1.3">AIR HOCKEY · 150</text>
+      <text x="346" y="482" font-size="9" fill="var(--artifact-text-secondary)" letter-spacing="0.6">SPECTATOR STANDING</text>
+    </g>
+
+    <!-- ENTRY -->
+    <g class="zoneG" data-zone="entry">
+      <rect class="zf" x="0" y="440" width="120" height="60" fill="var(--artifact-zone-service)" stroke="var(--artifact-border-dark)" stroke-width="1"/>
+      <rect x="30" y="494" width="56" height="9" fill="var(--artifact-felt)"/>
+      <rect x="86" y="450" width="26" height="42" rx="2" fill="none" stroke="var(--artifact-text-secondary)" stroke-width="1"/>
+      <text x="99" y="474" font-size="7.5" text-anchor="middle" fill="var(--artifact-text-secondary)">HOST</text>
+      <text x="8" y="434" font-size="11" fill="var(--artifact-text-primary)" letter-spacing="1.3">ENTRY · 70</text>
+      <text x="58" y="518" font-size="9.5" text-anchor="middle" fill="var(--artifact-text-secondary)" letter-spacing="1">STREET</text>
+    </g>
+
+    <!-- SERVICE SPINE -->
+    <g class="zoneG" data-zone="service">
+      <rect class="zf" x="460" y="340" width="180" height="160" fill="var(--artifact-zone-service)" stroke="var(--artifact-border-dark)" stroke-width="1"/>
+      <rect x="470" y="352" width="160" height="22" rx="3" fill="var(--artifact-felt)"/>
+      <g fill="none" stroke="var(--artifact-text-secondary)" stroke-width="1">
+        <circle cx="486" cy="392" r="9"/><circle cx="516" cy="392" r="9"/><circle cx="546" cy="392" r="9"/>
+        <circle cx="576" cy="392" r="9"/><circle cx="606" cy="392" r="9"/>
+      </g>
+      <text x="470" y="430" font-size="11" fill="var(--artifact-text-primary)" letter-spacing="1.3">BAR · 270</text>
+      <text x="470" y="448" font-size="9" fill="var(--artifact-text-secondary)">SIGHTLINE TO 90% OF FLOOR</text>
+
+      <rect class="zf" x="460" y="200" width="180" height="140" fill="var(--artifact-zone-boh)" stroke="var(--artifact-border-dark)" stroke-width="1"/>
+      <text x="470" y="222" font-size="11" fill="var(--artifact-text-primary)" letter-spacing="1.3">KITCHEN · 230</text>
+      <text x="470" y="240" font-size="9" fill="var(--artifact-text-secondary)">VENTLESS — NO TYPE 1 HOOD</text>
+
+      <rect class="zf" x="460" y="80" width="180" height="120" fill="var(--artifact-zone-boh)" stroke="var(--artifact-border-dark)" stroke-width="1"/>
+      <line x1="550" y1="80" x2="550" y2="200" stroke="var(--artifact-border-dark)" stroke-width="1"/>
+      <text x="470" y="102" font-size="11" fill="var(--artifact-text-primary)" letter-spacing="1.3">WASHROOMS · 215</text>
+      <text x="470" y="150" font-size="9" fill="var(--artifact-text-secondary)">2 SINGLE-</text>
+      <text x="470" y="162" font-size="9" fill="var(--artifact-text-secondary)">OCCUPANCY</text>
+      <text x="560" y="150" font-size="9" fill="var(--artifact-text-secondary)">BARRIER-</text>
+      <text x="560" y="162" font-size="9" fill="var(--artifact-text-secondary)">FREE</text>
+
+      <rect class="zf" x="460" y="0" width="180" height="80" fill="var(--artifact-zone-boh)" stroke="var(--artifact-border-dark)" stroke-width="1"/>
+      <text x="470" y="24" font-size="11" fill="var(--artifact-text-primary)" letter-spacing="1.3">BACK OF HOUSE · 145</text>
+      <text x="470" y="42" font-size="9" fill="var(--artifact-text-secondary)">OFFICE · DRY STORE · STAFF</text>
+      <rect x="600" y="0" width="40" height="8" fill="var(--artifact-felt)"/>
+      <text x="596" y="62" font-size="8.5" text-anchor="end" fill="var(--artifact-text-secondary)">LOADING DOOR</text>
+    </g>
+
+    <!-- circulation arrow -->
+    <g stroke="var(--artifact-felt-soft)" stroke-width="1.4" fill="none" stroke-dasharray="6 5">
+      <path d="M 58 492 L 58 470 L 150 420 L 250 300 L 420 300 L 470 330"/>
+    </g>
+    <text x="150" y="412" font-size="9" fill="var(--artifact-felt)" letter-spacing="0.8">ARRIVAL PATH</text>
+  </svg>
+  </div>
+
+  <div class="legend" data-glean-id="plan-legend">
+    <div class="lgi" data-zone="pool">
+      <span class="sw" style="background: var(--artifact-zone-pool);"></span>
+      <span class="n">Pool bay — Speed 3</span>
+      <span class="d">Five 7-ft tables in a 3-and-2 grid at the rear. Furthest point from the door. No walkway crosses a backstroke.</span>
+    </div>
+    <div class="lgi" data-zone="pods">
+      <span class="sw" style="background: var(--artifact-zone-pod);"></span>
+      <span class="n">Console pods — Speed 2</span>
+      <span class="d">Four pods with half-height banquette backs. Territory without enclosure. Bookable in 60-minute blocks.</span>
+    </div>
+    <div class="lgi" data-zone="air">
+      <span class="sw" style="background: var(--artifact-zone-air);"></span>
+      <span class="n">Air hockey — Speed 1</span>
+      <span class="d">In an alcove beside the bar, 3 ft clear behind each goal. Deliberately on the queue path, not near the cues.</span>
+    </div>
+    <div class="lgi" data-zone="lounge">
+      <span class="sw" style="background: var(--artifact-zone-lounge);"></span>
+      <span class="n">Booths, high-tops, perch</span>
+      <span class="d">Every seat backs onto a wall, a booth back, or a half-height screen. No open backs to a walkway.</span>
+    </div>
+    <div class="lgi" data-zone="flex">
+      <span class="sw" style="background: var(--artifact-background-mid);"></span>
+      <span class="n">Flex floor</span>
+      <span class="d">Deliberately under-furnished. Tournaments, screenings, buyouts, pop-ups — or table six, if utilization earns it.</span>
+    </div>
+    <div class="lgi" data-zone="service">
+      <span class="sw" style="background: var(--artifact-zone-service);"></span>
+      <span class="n">Service spine</span>
+      <span class="d">Bar, ventless kitchen, washrooms and back of house stacked on one wall, so plumbing and exhaust share a single wet stack.</span>
+    </div>
+  </div>
+</section>
+
+<section id="budget" data-glean-id="section-budget">
+  <p class="eyebrow">Space budget</p>
+  <h2>Where all 3,200 square feet go</h2>
+  <p class="lede">Revenue-producing floor is 1,490 sq ft, or 47% of the box. That ratio is the one to defend during value engineering, because every square foot of it is rented at the same rate as the storage room.</p>
+  <table data-glean-id="table-space-budget">
+    <thead><tr><th>Zone</th><th class="r">Sq ft</th><th class="r">Share</th><th style="width:34%">Share of floor</th></tr></thead>
+    <tbody>
+      <tr><td>Pool bay<span class="sub">5 × 7-ft tables, shared cue clearance</span></td><td class="r">940</td><td class="r">29%</td><td><span class="bar" style="width:100%"></span></td></tr>
+      <tr><td>Booths, high-tops, perch seating</td><td class="r">370</td><td class="r">12%</td><td><span class="bar" style="width:39%"></span></td></tr>
+      <tr><td>Circulation &amp; egress</td><td class="r">370</td><td class="r">12%</td><td><span class="bar" style="width:39%"></span></td></tr>
+      <tr><td>Console pods<span class="sub">4 pods, half-open</span></td><td class="r">290</td><td class="r">9%</td><td><span class="bar" style="width:31%"></span></td></tr>
+      <tr><td>Bar &amp; service well</td><td class="r">270</td><td class="r">8%</td><td><span class="bar" style="width:29%"></span></td></tr>
+      <tr><td>Kitchen, ventless, plus dish</td><td class="r">230</td><td class="r">7%</td><td><span class="bar" style="width:24%"></span></td></tr>
+      <tr><td>Washrooms<span class="sub">2 single-occupancy, barrier-free</span></td><td class="r">215</td><td class="r">7%</td><td><span class="bar" style="width:23%"></span></td></tr>
+      <tr><td>Air hockey alcove</td><td class="r">150</td><td class="r">5%</td><td><span class="bar" style="width:16%"></span></td></tr>
+      <tr><td>Back of house</td><td class="r">145</td><td class="r">5%</td><td><span class="bar" style="width:15%"></span></td></tr>
+      <tr><td>Flex / event floor</td><td class="r">110</td><td class="r">3%</td><td><span class="bar" style="width:12%"></span></td></tr>
+      <tr><td>Entry, host, vestibule</td><td class="r">70</td><td class="r">2%</td><td><span class="bar" style="width:7%"></span></td></tr>
+      <tr><td>Service circulation</td><td class="r">40</td><td class="r">1%</td><td><span class="bar" style="width:4%"></span></td></tr>
+      <tr class="tot"><td>Total</td><td class="r">3,200</td><td class="r">100%</td><td></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="clearance" data-glean-id="section-clearance">
+  <p class="eyebrow">The clearance math</p>
+  <h2>Why five tables, not six</h2>
+  <p>A 7-ft table has a 39 by 78 inch playing surface and an overall footprint of roughly 46 by 85 inches. Published room charts say a single 7-ft table wants a 13 by 16 foot room with a standard 58-inch cue, because a player needs about five feet of clear backstroke on every side.</p>
+  <p>Six times 13 by 16 is 1,248 square feet, and that is the number most first-time operators budget. It is also wrong. In a commercial bay, neighbouring tables <b>share</b> the five-foot band between them, so the real cost is footprint plus one shared aisle — about 190 sq ft per table in a 3-and-2 grid, or 940 sq ft for five.</p>
+  <div class="focal" data-glean-id="focal-sixth-table">
+    <div class="big">The sixth table costs 160 square feet. The only place it can come from is the flex floor and eight booth seats.</div>
+    <p>Hold at five, and leave that slab clear, level and unobstructed with a power drop already in the floor. If blended utilization proves out above 35% for two consecutive quarters, table six installs in a weekend. If it does not, the space has been earning money as event floor the whole time.</p>
+  </div>
+  <div class="note" data-glean-id="note-technical">
+    <b>Three physical constraints that are not negotiable.</b> Ceiling at 10 ft clear minimum — published guidance puts 8 ft as the floor and 9 ft or more as ideal, and pendant fixtures hang 32 to 36 inches above the cloth. Slate tables sit on grade only, never an upper floor. And acoustics are the single most under-budgeted line in this category: baffles over the pool bay and the pod zone are the difference between a room that buzzes and a room nobody stays in.
+  </div>
+</section>
+
+<section id="speeds" data-glean-id="section-speeds">
+  <p class="eyebrow">Zoning logic</p>
+  <h2>Three speeds, one room, no walls</h2>
+  <p class="lede">Different groups want different intensity, and the mistake is forcing them all into the same intensity. Speed increases as you walk away from the door.</p>
+  <div class="speeds">
+    <div class="speed" data-glean-id="speed-1">
+      <span class="num">Speed 1 — Social</span>
+      <h3>Front right, by the bar</h3>
+      <p class="who">Couples · first dates · solo arrivals · anyone waiting</p>
+      <p>Air hockey, high-tops, perch seating, the bar. Games here last <strong>four to ten minutes</strong>, not forty-five. No booking, no commitment, no equipment knowledge required. This is where someone who has never held a cue can stand with a drink and still feel like a participant rather than an audience.</p>
+    </div>
+    <div class="speed" data-glean-id="speed-2">
+      <span class="num">Speed 2 — Group</span>
+      <h3>Centre and left</h3>
+      <p class="who">Crews of 6–8 · birthdays · after-work groups</p>
+      <p>Four console pods and the booth wall. Pods have <strong>half-height banquette backs, not doors</strong> — a closed room kills the energy of the main floor and creates a supervision problem; a half-open pod gives a group its own territory while keeping it visible from the bar. Bookable in 60-minute blocks.</p>
+    </div>
+    <div class="speed" data-glean-id="speed-3">
+      <span class="num">Speed 3 — Play</span>
+      <h3>Rear bay</h3>
+      <p class="who">League players · regulars · serious practice</p>
+      <p>The three best-lit tables, furthest from traffic, with no walkway crossing a backstroke. League night lives here. Regulars get genuinely better playing conditions than anywhere else in the building — <strong>and they get them without setting the tone for the whole room</strong>, which is the entire point.</p>
+    </div>
+  </div>
+</section>
+
+<section id="hockey" data-glean-id="section-hockey">
+  <p class="eyebrow">The one table everybody plays</p>
+  <h2>Air hockey earns its 150 sq ft by sitting in the queue</h2>
+  <p>A commercial 8-ft table measures 99.5 by 51.5 inches and weighs 435 lbs; the 7-ft version is 84 by 44 inches at 380 lbs. With three feet clear behind each goal and three at the sides, the 7-ft table needs a 10 by 15 foot alcove. That is five percent of the floor for a two-player game, which only makes sense if it is placed correctly.</p>
+  <p>Two placement rules, both counter-intuitive:</p>
+  <ul class="cl" data-glean-id="list-hockey-rules">
+    <li data-k="01"><b>Never adjacent to the pool bay.</b> A blower running at volume, pucks hitting rails, and a crowd that shouts and lunges is the worst possible neighbour for someone lining up a shot. Worse, spectators spill directly into cue clearance. Put a solid wall or the full width of the lounge between them.</li>
+    <li data-k="02"><b>Put it on the waiting path.</b> A three-minute game converts wait time into dwell time, and dwell time into a second drink. On a Friday with every table booked, the group standing at the host desk is either playing air hockey and ordering, or they are leaving. This is the highest-return 150 square feet in the building and it has almost nothing to do with air hockey.</li>
+  </ul>
+  <div class="note" data-glean-id="note-hockey-price">
+    <b>Price it as a hook, not a line item.</b> Free with any table or pod booking; a $2 token otherwise. The revenue is not in the table — it is in the fact that nobody who plays air hockey is standing around deciding whether to stay. Budget a refurbished commercial unit at roughly $4,000 CAD rather than a new coin-operated model, which lists between US$5,695 and US$9,290 before freight and duty.
+  </div>
+</section>
+
+<section id="arrival" data-glean-id="section-arrival">
+  <p class="eyebrow">The first fifteen feet</p>
+  <h2>A visitor who cannot answer three questions will leave</h2>
+  <p>What does it cost, where do I sit, and where is the washroom. If a first-time visitor can answer all three without speaking to anyone, they stay. If they cannot, they stand in the doorway for eleven seconds and go somewhere else. That is the whole brief for the entry sequence.</p>
+  <ul class="cl" data-glean-id="list-arrival">
+    <li data-k="01"><b>Sightline order from the door:</b> host stand, price board, bar, air hockey. In that sequence. What a visitor must <i>not</i> see first is a wall of strangers' backs bent over tables — which is precisely what every traditional hall opens with, and precisely why its audience self-selected down to people who already play.</li>
+    <li data-k="02"><b>Washrooms within 40 feet of the entry</b>, signposted from the door, two single-occupancy barrier-free rooms rather than one multi-stall. Nobody should have to cross the entire floor, past every table, to find them.</li>
+    <li data-k="03"><b>The pool bay is the furthest thing from the door by design.</b> It is the most intimidating element for a newcomer and the most sensitive to interruption for a regular. Distance solves both problems with one decision.</li>
+    <li data-k="04"><b>One staff position at the bar sees 90% of the floor.</b> This reads as a comfort and safety feature, and it is — but it is also how a 3,200 sq ft room runs on two people on a Tuesday, which is what holds labour at roughly 30% of revenue.</li>
+  </ul>
+</section>
+
+<section id="mechanics" data-glean-id="section-mechanics">
+  <p class="eyebrow">Inclusion mechanics</p>
+  <h2>Cheap fixes that almost nobody does</h2>
+  <p class="lede">None of this is decor and none of it is expensive. It is the gap between a room that technically welcomes everybody and a room where everybody actually stays.</p>
+  <ul class="cl" data-glean-id="list-mechanics">
+    <li data-k="01"><b>A cue wall with 52-inch and 58-inch cues in 18 to 21 oz weights.</b> A 58-inch cue is the published standard, but it is genuinely unplayable for shorter players, and equipment that does not fit is the fastest way to tell somebody a room is not for them. <span class="cost">Cost: under $900</span></li>
+    <li data-k="02"><b>Sound capped at 78–80 dB in the social zone.</b> Couples leave rooms where they cannot hear each other, and the loss is invisible because they never complain — they just do not return. A locked limiter on the mixer and a meter behind the bar. <span class="cost">Cost: under $400</span></li>
+    <li data-k="03"><b>Lighting in three deliberate layers.</b> Warm, honest, bright task light over the cloth; dim perimeter; one accent feature wall. Bright, well-stocked washrooms with proper mirrors and locks. Not a black box.</li>
+    <li data-k="04"><b>No seat with an open back to a walkway.</b> Booth backs, wall seating, or half-height screens throughout. Nobody relaxes in a room where they can be approached from behind without seeing it.</li>
+    <li data-k="05"><b>A table-side QR to a 60-second rules video</b> and a one-line house-rules card. Staff offer a two-minute intro once, then leave. Beginners want permission to be bad at something, not supervision.</li>
+    <li data-k="06"><b>A code of conduct at the door and in every booking confirmation</b>, and any staff member empowered to move or comp a group without finding a manager. The policy matters less than the speed of the response.</li>
+    <li data-k="07"><b>A non-alcoholic list designed and priced like the cocktail list.</b> In the Scarborough–Ajax catchment this is not a concession, it is a primary revenue line — and it is the reason the venue can open profitably before the liquor licence lands.</li>
+  </ul>
+</section>
+
+<section id="week" data-glean-id="section-week">
+  <p class="eyebrow">Programming</p>
+  <h2>Every night needs a reason to exist</h2>
+  <p>Peak Friday and Saturday evenings will run 80–90% occupancy on their own. Tuesday at 3pm will run near zero. The business is won in the gap, and the gap is filled by programming, not by marketing spend.</p>
+  <div class="week" data-glean-id="week-grid">
+    <div class="wrow"><div class="day">Mon</div><div>Closed to walk-ins. Private bookings and corporate buyouts only.</div><div class="tgt">Zero labour, zero waste</div></div>
+    <div class="wrow"><div class="day">Tue</div><div>Learn-to-Play clinic at 7pm. Half-price table time all night.</div><div class="tgt">Beginners, couples</div></div>
+    <div class="wrow"><div class="day">Wed</div><div>Mixed-pairs alternate-shot league. Eight weeks, sixteen teams.</div><div class="tgt">The inclusion engine</div></div>
+    <div class="wrow"><div class="day">Thu</div><div>Console cup — four-person teams, $10 entry, bar-tab prize.</div><div class="tgt">Pods at full utilization</div></div>
+    <div class="wrow peak"><div class="day">Fri</div><div>Peak social. Bookings only after 8pm. DJ from 10pm. No leagues.</div><div class="tgt">Maximum spend per head</div></div>
+    <div class="wrow peak"><div class="day">Sat</div><div>Peak social. Air hockey ladder on the hour. DJ from 10pm.</div><div class="tgt">Maximum spend per head</div></div>
+    <div class="wrow"><div class="day">Sun</div><div>Afternoon birthday and family buyouts. Evening cricket and football screenings.</div><div class="tgt">Two audiences, one day</div></div>
+  </div>
+  <div class="note" data-glean-id="note-wednesday">
+    <b>Wednesday is the most important night of the week</b> and it looks like the least important. An alternate-shot mixed-pairs format is the single most effective inclusion mechanic in billiards: it structurally requires mixed teams, it hides skill gaps because partners alternate shots, and it turns a solo regular into a pair who both now have a standing Wednesday commitment. It builds the cohort that fills Tuesday and Thursday.
+  </div>
+</section>
+
+<section id="price" data-glean-id="section-price">
+  <p class="eyebrow">Pricing architecture</p>
+  <h2>Price the group, not the person</h2>
+  <p>Per-person pricing punishes exactly the customers this venue is trying to win — a couple, or a group where two people play and four watch. Charge for the asset and let the group self-organise around it.</p>
+  <table data-glean-id="table-pricing">
+    <thead><tr><th>Offer</th><th>Basis</th><th class="r">Price</th><th style="width:30%">Why</th></tr></thead>
+    <tbody>
+      <tr><td>Pool table, off-peak</td><td>Per table / hour</td><td class="r">$12</td><td>Fills dead afternoons at near-100% margin</td></tr>
+      <tr><td>Pool table, peak</td><td>Per table / hour</td><td class="r">$18</td><td>Market benchmark is $12–18, $20 at peak</td></tr>
+      <tr><td>Console pod</td><td>Per pod / hour</td><td class="r">$14</td><td>GTA venues price seats at $5–7; pods are a dwell driver, not a profit centre</td></tr>
+      <tr><td>Air hockey</td><td>Free with any booking</td><td class="r">$2</td><td>Converts queue time into dwell and a second drink</td></tr>
+      <tr><td>Date Night, 2 hrs</td><td>Table + 2 drinks + 1 snack</td><td class="r">$55</td><td>Removes the biggest friction for couples: not knowing what it will cost</td></tr>
+      <tr><td>Crew Pack, 3 hrs</td><td>Table + pod + pitcher + 3 platters</td><td class="r">$160</td><td>Books the two highest-margin assets together for 6–8 people</td></tr>
+      <tr><td>Membership</td><td>Annual</td><td class="r">$129</td><td>Priority booking, 20% off off-peak, free league entry. Funds working capital pre-opening</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="capex" data-glean-id="section-capex">
+  <p class="eyebrow">Capex delta</p>
+  <h2>What this layout costs against the $174,200 base</h2>
+  <p>Adding air hockey and doing the acoustics properly costs about $9,300. Funding it by cutting contingency is the obvious move and the wrong one.</p>
+  <table data-glean-id="table-capex-delta">
+    <thead><tr><th>Change</th><th class="r">CAD</th></tr></thead>
+    <tbody>
+      <tr><td>Refurbished commercial 7-ft air hockey table, delivered and levelled</td><td class="r">+4,000</td></tr>
+      <tr><td>Acoustic baffles over the pool bay and pod zone</td><td class="r">+4,500</td></tr>
+      <tr><td>Mixed-weight cue wall with 52-inch short cues</td><td class="r">+800</td></tr>
+      <tr><td>Contingency reduced from 13,000 to 6,000</td><td class="r">(7,000)</td></tr>
+      <tr><td>Lounge furniture trimmed from 10,000 to 8,000</td><td class="r">(2,000)</td></tr>
+      <tr class="tot"><td>Revised total</td><td class="r">174,500</td></tr>
+    </tbody>
+  </table>
+  <div class="note" data-glean-id="note-contingency">
+    <b>Flag this in the case study rather than hiding it.</b> A $6,000 contingency on a $150,000 build is about 4%, and the honest range is 10–15%. The defensible version finances the air hockey table and the acoustic package on a 36-month equipment lease at roughly $280 a month, keeps contingency at $13,000, and accepts slightly thinner monthly cash flow in exchange for surviving the first unbudgeted surprise — which, in a second-generation space, always arrives.
+  </div>
+</section>
+
+<section id="sources" data-glean-id="section-sources">
+  <p class="eyebrow">Sources</p>
+  <h2>Dimensions and equipment benchmarks</h2>
+  <ul class="srcs">
+    <li>Pool table playing surfaces, footprints and the 5-ft / 58-inch cue clearance rule: <a href="https://www.askabilliards.com/blogs/billiards-guide/how-to-choose-pool-table-size-for-your-room">Ask a Billiards room-size guide</a>, <a href="https://billiardhome.com/room-calculator">Billiard Home room calculator</a>, <a href="https://quarterkingbilliards.com/pool-table-sizes-dimensions-room-requirements-guide/">Quarter King Billiards clearance guide</a></li>
+    <li>Ceiling height guidance: <a href="https://quarterkingbilliards.com/pool-table-sizes-dimensions-room-requirements-guide/">Quarter King Billiards</a></li>
+    <li>Commercial air hockey dimensions, weights and pricing: <a href="https://www.gameroomshop.com/products/valley-dynamo-pro-style-8-air-hockey-table">Valley-Dynamo Pro Style 8 ft</a>, <a href="https://www.mancaveempire.com/products/valley-dynamo-dynamo-pro-style-air-hockey-table">Pro Style 7 ft and 8 ft specifications</a>, <a href="https://www.gameroomshop.com/products/dynamo-best-shot-coin-operated-air-hockey-table">Dynamo Best Shot coin-operated</a>, <a href="https://whitebilliards.com/products/valley-dynamo-coin-operated-fire-storm-air-hockey-table">Dynamo Fire Storm coin-operated</a></li>
+    <li>Table-time and gaming-seat price benchmarks: <a href="https://www.jim.com/blog/how-to-start-a-billiards-business">billiards business pricing playbook</a>, <a href="https://player-base.ca/">Player Base, Markham</a>, <a href="https://invictusgamestation.com/pages/services">Invictus Game Station</a></li>
+  </ul>
+</section>
+
+</div>
+
+<script>
+(function () {
+  var groups = Array.prototype.slice.call(document.querySelectorAll('svg.plan .zoneG'));
+  var items = Array.prototype.slice.call(document.querySelectorAll('.lgi'));
+
+  function focus(zone) {
+    groups.forEach(function (g) {
+      var match = g.getAttribute('data-zone') === zone;
+      g.classList.toggle('dim', zone !== null && !match);
+      g.classList.toggle('hot', zone !== null && match);
+    });
+  }
+  items.forEach(function (it) {
+    var z = it.getAttribute('data-zone');
+    it.addEventListener('mouseenter', function () { focus(z); });
+    it.addEventListener('mouseleave', function () { focus(null); });
+    it.setAttribute('tabindex', '0');
+    it.addEventListener('focus', function () { focus(z); });
+    it.addEventListener('blur', function () { focus(null); });
+  });
+  groups.forEach(function (g) {
+    g.addEventListener('mouseenter', function () { focus(g.getAttribute('data-zone')); });
+    g.addEventListener('mouseleave', function () { focus(null); });
+  });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+  var secs = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  function onScroll() {
+    var best = 0;
+    secs.forEach(function (s, i) {
+      if (s && s.getBoundingClientRect().top <= 120) best = i;
+    });
+    links.forEach(function (a, i) { a.classList.toggle('active', i === best); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+
+<script>
+  window.GleanBridge.postMessage({
+    actionId: 'export-pdf',
+    type: 'glean-add-menu',
+    metadata: { label: 'Export as PDF', icon: 'export' }
+  });
+  window.GleanBridge.onMessage('action', function(data) {
+    if (data.actionId === 'export-pdf') window.print();
+  });
+
+  function prepareChartsForPrint() {
+    document.querySelectorAll('[_echarts_instance_]').forEach(function(el) {
+      var chart = echarts.getInstanceByDom(el);
+      if (!chart) return;
+      var img = new Image();
+      img.src = chart.getDataURL({ type: 'png', pixelRatio: 2 });
+      img.className = 'print-chart-img';
+      img.style.cssText =
+        'width:100%;height:100%;object-fit:contain;' +
+        'position:absolute;top:0;left:0;z-index:10;';
+      el.dataset.prevPosition = el.style.position;
+      el.style.position = 'relative';
+      el.appendChild(img);
+    });
+  }
+
+  function cleanUpAfterPrint() {
+    document.querySelectorAll('[_echarts_instance_]').forEach(function(el) {
+      var img = el.querySelector('.print-chart-img');
+      if (!img) return;
+      img.remove();
+      el.style.position = el.dataset.prevPosition || '';
+      delete el.dataset.prevPosition;
+    });
+  }
+
+  window.addEventListener('beforeprint', prepareChartsForPrint);
+  window.addEventListener('afterprint', cleanUpAfterPrint);
+</script>
+
+</body>
+</html>
